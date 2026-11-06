@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+package.json
+package-lock.json
+bun.lock
+skills/personal/
+tmp/
+.agent-notes/handoff.md
+.agent-notes/sessions/
+.agent-notes/personal/

@@ -1,0 +1,277 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# notes — tooling for the .agent-notes/ convention. Ruby stdlib only.
+# The PATH entry point is `agency` (bin/agency): `agency notes <cmd>`.
+# Run from the project root whose .agent-notes/ you mean.
+#
+#   notes report          grouped TOC by status (durable layer: root +
+#                         plans/ + research/)
+#   notes stale [days]    durable notes untouched for N days (default 90);
+#                         personal/ listed separately
+#   notes lint            missing/invalid frontmatter on durable notes —
+#                         non-zero exit on any problem (hook-friendly)
+#   notes format          autofill missing frontmatter fields; review the diff
+#   notes expire [days]   list sessions/ docs older than N days (default 30)
+#   notes expire -- f...  delete exactly the named sessions/ files — review
+#                         by construction; nothing is deleted by a flag
+#
+# Scope: the durable layer is root notes plus the category dirs (plans/,
+# research/). handoff.md, sessions/, and personal/ are the ephemeral layer —
+# exempt from lint/format; sessions/ decay is `agency notes expire`'s job
+# (listing + named-file deletion).
+#
+# Requires Ruby 4.0+ (chruby, rbenv, mise, asdf, ...). Older Rubies,
+# including macOS system Ruby 2.6, will not parse this.
+
+require 'date'
+require 'open3'
+require 'yaml'
+
+STATUSES = %w[active parked done].freeze
+NOTES_DIR = '.agent-notes'
+HANDOFF = 'handoff.md'
+CATEGORY_DIRS = %w[plans research].freeze
+FRONTMATTER_PATTERN = /\A---\n(.+?)\n---\n?/m
+
+# ANSI helpers: color only on a tty.
+def colorize(text, code)
+  $stdout.tty? ? "\e[#{code}m#{text}\e[0m" : text
+end
+
+STATUS_CODES = { 'active' => 92, 'parked' => 93, 'done' => 2, 'invalid' => 91 }.freeze
+
+def root_files
+  Dir.glob("#{NOTES_DIR}/*.md").reject { |path| File.basename(path) == HANDOFF }.sort
+end
+
+def category_files
+  CATEGORY_DIRS.flat_map { |dir| Dir.glob("#{NOTES_DIR}/#{dir}/**/*.md") }.sort
+end
+
+def durable_files = root_files + category_files
+
+def personal_files
+  Dir.glob("#{NOTES_DIR}/personal/**/*.md").sort
+end
+
+# One root note: frontmatter, validation errors, derived display values.
+class Note
+  attr_reader :path, :errors
+
+  def initialize(path)
+    @path = path
+    @content = File.read(path)
+    @has_block = false
+    @frontmatter = {}
+    @frontmatter_valid = false
+    @errors = []
+    parse
+  end
+
+  def valid? = @errors.empty?
+
+  # A note without a frontmatter block gains one; a block with broken YAML
+  # cannot be autofilled.
+  def fixable? = !@has_block || @frontmatter_valid
+
+  def status = @frontmatter['status']
+
+  # Review display for ephemeral notes (no frontmatter contract): derived
+  # title and first-paragraph summary.
+  def display_title = derived_title
+
+  def display_summary
+    paragraph = body.lines.reject { |line| line.strip.empty? || line.start_with?('#') }.first
+    paragraph&.strip || ''
+  end
+
+  def updated_date
+    @updated_date ||= git_date || file_date
+  end
+
+  def formatted_content
+    fields = @frontmatter.dup
+    fields['title'] ||= derived_title
+    fields['status'] ||= 'active'
+    fields['summary'] = derived_summary if fields['summary'].to_s.strip.empty?
+    "#{frontmatter_block(fields)}#{body.start_with?("\n") ? body : "\n#{body}"}"
+  end
+
+  private
+
+  def parse
+    match = @content.match(FRONTMATTER_PATTERN)
+    @has_block = !match.nil?
+    return @errors << 'missing frontmatter' if match.nil?
+
+    parsed = begin
+      YAML.safe_load(match[1])
+    rescue Psych::Exception
+      nil
+    end
+    return @errors << 'invalid frontmatter YAML' unless parsed.is_a?(Hash)
+
+    @frontmatter = parsed
+    @frontmatter_valid = true
+    @errors << "status must be one of #{STATUSES.join(', ')}" unless STATUSES.include?(status)
+    @errors << 'summary is missing' if @frontmatter['summary'].to_s.strip.empty?
+  end
+
+  def derived_title
+    first_heading || File.basename(@path, '.md')
+  end
+
+  def derived_summary
+    paragraph = body.lines.reject { |line| line.strip.empty? || line.start_with?('#') }.first
+    paragraph&.strip || first_heading || ''
+  end
+
+  def first_heading
+    body.lines.detect { |line| line.start_with?('# ') }&.sub(/\A#\s+/, '')&.strip
+  end
+
+  def body
+    @body ||= @has_block ? @content.sub(FRONTMATTER_PATTERN, '') : @content
+  end
+
+  def frontmatter_block(fields)
+    lines = fields.map { |key, value| "#{key}: #{yaml_scalar(value)}" }
+    "---\n#{lines.join("\n")}\n---\n"
+  end
+
+  def yaml_scalar(value)
+    text = value.to_s
+    return text.inspect if text.empty? || text != text.strip
+    return text.inspect if text.match?(/:\s|\s#|\A[#&*!|>'"%@`\[\]?-]/) || text.end_with?(':')
+
+    text
+  end
+
+  def git_date
+    output, _err, _status = Open3.capture3('git', 'log', '-1', '--format=%cs', '--', @path)
+    date = output.strip
+    date unless date.empty?
+  end
+
+  # Untracked notes carry no git date; the filesystem mtime keeps them
+  # visible to staleness checks.
+  def file_date
+    return unless File.exist?(@path)
+
+    File.mtime(@path).strftime('%Y-%m-%d')
+  end
+end
+
+def notes = durable_files.map { |path| Note.new(path) }
+
+def display_path(note) = note.path.delete_prefix("#{NOTES_DIR}/")
+
+def report
+  all = notes
+  return puts 'No notes in .agent-notes/ yet.' if all.empty?
+
+  (STATUSES + [nil]).each do |status|
+    group = all.select { |note| STATUSES.include?(note.status) ? note.status == status : status.nil? }
+    next if group.empty?
+
+    label = status || 'invalid'
+    puts "  #{colorize("#{label.upcase} (#{group.size})", STATUS_CODES.fetch(label))}"
+    group.sort_by { |note| note.updated_date.to_s }.reverse.each do |note|
+      puts "    #{note.updated_date || '—'}  #{display_path(note)}"
+    end
+    puts
+  end
+end
+
+def stale(days)
+  cutoff = Date.today - days
+  stale_notes = notes.select { |note| note.updated_date && Date.parse(note.updated_date) < cutoff }
+  stale_personal = personal_files.filter_map do |path|
+    note = Note.new(path)
+    note.updated_date && Date.parse(note.updated_date) < cutoff ? note : nil
+  end
+  if stale_notes.empty? && stale_personal.empty?
+    return puts(durable_files.empty? && personal_files.empty? ? 'No notes in .agent-notes/ yet.' : "No notes older than #{days} days.")
+  end
+
+  unless stale_notes.empty?
+    puts "Notes not touched in #{days}+ days — promote, update, or park:"
+    stale_notes.sort_by(&:updated_date).each do |note|
+      puts "  #{note.updated_date}  #{note.status}  #{display_path(note)}"
+    end
+  end
+  return if stale_personal.empty?
+
+  puts
+  puts "Personal notes in personal/ older than #{days} days — yours to keep or delete, no action implied:"
+  stale_personal.sort_by(&:updated_date).each do |note|
+    puts "  #{note.updated_date}  #{display_path(note)}"
+  end
+end
+
+def lint
+  problems = notes.filter_map { |note| "#{note.path}: #{note.errors.join('; ')}" unless note.valid? }
+  puts(problems.any? ? problems : 'notes lint: clean')
+  exit 1 if problems.any?
+end
+
+# Ephemeral-layer decay: sessions/ docs older than `days` (default 30).
+# Listing only, until files are named explicitly — review by construction.
+def expire(days, targets = nil)
+  dir = "#{NOTES_DIR}/sessions"
+  return targets ? delete_expired(targets, dir) : list_expired(dir, days)
+end
+
+def list_expired(dir, days)
+  cutoff = Date.today - days
+  candidates = Dir.glob("#{dir}/*.md").select { |path| File.mtime(path).to_date < cutoff }
+  return puts("No #{dir}/ docs older than #{days} days.") if candidates.empty?
+
+  puts "sessions/ docs older than #{days} days — review, then name files to delete:"
+  candidates.sort.each do |path|
+    note = Note.new(path)
+    puts "  #{File.basename(path, '.md')}  #{note.updated_date || '—'}  #{note.display_title}"
+    summary = note.display_summary
+    puts "    #{summary}" unless summary.empty?
+  end
+  puts 'Delete with: agency notes expire -- <file> ... (paths must be inside sessions/)'
+end
+
+def delete_expired(targets, dir)
+  failures = targets.filter_map do |target|
+    path = File.expand_path(target)
+    unless path.start_with?("#{File.expand_path(dir)}/") && path.end_with?('.md') && File.file?(path)
+      next "#{target} — not a sessions/ markdown file; refusing"
+    end
+
+    File.delete(path)
+    "deleted #{target}"
+  end
+  puts failures
+  exit 1 if failures.any? { |line| line.include?('refusing') }
+end
+
+def format
+  results = notes.filter_map do |note|
+    next if note.valid?
+    next "#{note.path} — could not autofix (#{note.errors.join('; ')})" unless note.fixable?
+
+    File.write(note.path, note.formatted_content)
+    "#{note.path} (#{note.errors.join('; ')})"
+  end
+  return puts results if results.any?
+
+  puts 'nothing to format'
+end
+
+case ARGV[0]
+when 'report' then report
+when 'stale' then stale(ARGV[1]&.to_i || 90)
+when 'lint' then lint
+when 'format' then format
+when 'expire' then expire(ARGV[1] == '--' ? 30 : (ARGV[1]&.to_i || 30), ARGV[1] == '--' ? ARGV[2..] : nil)
+else
+  puts 'usage: notes <report|stale|lint|format|expire> [-- files...]'
+  exit 2
+end
