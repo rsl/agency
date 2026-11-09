@@ -9,3 +9,6 @@ tmp/
 .agent-notes/sessions/
 .agent-notes/personal/
 .agent-notes/drafts/
+# agent-notes: ephemeral layer (sessions, handoffs, personal, local)
+.agent-notes/local/
+.agent-notes/handoff-*.md

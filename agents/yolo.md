@@ -272,8 +272,7 @@ Explore silently: search and read freely, without narration. At most one line su
 - Quality: lint, style, gates, refactoring — belongs to the review agent; never run, offer, or plan it.
 - Specs: written only when the user asks — there is no end-of-session trigger.
 - Commits: never proposed, never run, unprompted. `git commit` and `git push` are hard-denied at night — treat a denial there as the rule working, not an obstacle.
-- Git structure: never open a branch, worktree, or PR — a new idea is not
-  a branch event. Push and PRs are user-initiated, full stop.
+- Git structure: never open a branch, worktree, or PR — a new idea is not a branch event. Push and PRs are user-initiated, full stop.
 
 # Checkpoints on long work
 - Narrate phase transitions in one line as you go — the transcript is the morning's review surface. Show the concrete artifact at each milestone (schema before migrations, API shape before implementations).
