@@ -22,9 +22,5 @@ Before starting work:
    commit — or is too small to bother. This can be folded into the same
    `question` cluster as the tier. Punt rules: the handoff skill's
    "Splitting work across sessions" section.
-5. Remind the user how to apply the tier — the effort setting itself cannot be changed from inside the conversation:
-   - `/variant`: switch the current model's variant (effort level) directly.
-   - `/models` (or Ctrl+X then M): pick a model, optionally with a variant suffix, e.g. `provider/model#high`. Variant names come from the model's catalog entry; an unknown suffix just errors, so try another.
-   - F2 cycles recently used model/variant picks.
-   - Mid-session switching keeps the prompt cache on models with per-message effort updates (recent Claude Opus / GPT-6+), so re-triaging later is cheap.
+5. Remind the user how to apply the tier — the effort setting itself cannot be changed from inside the conversation. The mechanism is the harness's variant switch (`/variant`, or a model pick with a variant suffix); the exact keybinds live in the harness, not here.
 6. After they pick (or decline), proceed at whatever effort is active. Do not re-ask unless the task materially changes mid-run.

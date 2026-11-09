@@ -5,6 +5,7 @@ package-lock.json
 bun.lock
 skills/personal/
 tmp/
-.agent-notes/handoff.md
+.agent-notes/handoff*.md
 .agent-notes/sessions/
 .agent-notes/personal/
+.agent-notes/drafts/

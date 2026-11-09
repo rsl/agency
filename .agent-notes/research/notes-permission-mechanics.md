@@ -63,8 +63,6 @@ deliberate probe outside `research/` was denied (see session report).
 
 opencode's "always" reply on a permission ask writes a PERMANENT row to
 `~/.local/share/opencode/opencode.db` (`permission` table, keyed by
-project), layered into every future session before the ask fires. 704
-rows were found and wiped Nov 6 (backup at tmp/permission-backup dump).
-Config denies still beat saved allows; saved allows silently defeat
-config asks indefinitely. "Always" is a deliberate, permanent,
-per-project grant.
+project), layered into every future session before the ask fires. Saved allows override config asks indefinitely; config *denies*
+still win (cannot be overridden by any allow). "Always" is a deliberate,
+permanent, per-project grant.

@@ -10,15 +10,11 @@ Decisions from the Nov 5 2026 plan-mode session ("look at the skills and
 agents, think about flow"). This doc is the executor's brief: decisions WITH
 their reasoning (the search, not just the destination), then phases in
 execution order, then open forks and verification items. Consume it by doing
-the work and promoting the durable parts into WORKFLOW.md and the skills —
+the work and promoting the durable parts into the skills —
 same promote-don't-park rule as everything else. First resident of this
 repo's .agent-notes/, written under the conventions it describes — and its
 own write (from a plan-mode session, via the .agent-notes carve-out) was the
 live test of the plan-mode permission change.
-
-State: config edits already landed in opencode.jsonc (Phase 0). No other
-file touched. Agency repo: git-initialized, zero commits, everything
-untracked.
 
 ## Decisions and why
 
@@ -26,10 +22,10 @@ untracked.
 
 Agents = who holds the context. Skills = protocols that fire on an event;
 the name says when. Commands = the user's muscle memory. "Gate" exits the
-base vocabulary entirely — it's machinery vocabulary FA repos use locally
-(their gem's own term), not a base word.
+base vocabulary entirely — it's machinery vocabulary other repos use locally
+repos use locally, not a base word.
 
-The naming principle, codified after RSL rejected "gate" ("gate is such an
+The naming principle, codified after the user rejected "gate" ("gate is such an
 agent word — what is it to a human?"):
 
 > No name is protected by precedent. Every pass, every name re-earns its
@@ -52,16 +48,19 @@ one name, which is evidence it's the right principle.
   domain skills was the "no flow" feeling; renaming is cheap now (zero
   commits, few reference sites).
 - duet, research, review keep their names. duet encodes the philosophy
-  (user leads, agent executes); WORKFLOW.md is built on it.
+  (user leads, agent executes); the machine-local workflow doc is built
+  on it.
 - `whoa` = command AND skill, same name. The skill's trigger IS the word.
   The command stays despite the /kickoff-wrapper-removal precedent because
   whoa is an interrupt — skill loading is decided by the drifting agent
   itself; the command is the deterministic path. Planning skills don't need
   that guarantee; stop-mechanisms do.
-  **Override, Nov 5 post-Phase-1 (RSL, empirical): the agent never catches
+  **Override, Nov 5 post-Phase-1 (user-confirmed, empirical): the agent never catches
   itself** — the skill's self-trigger has no instances, this session
   included (the agent tightened a command past its judgment calls while
-  discussing the rule against it). whoa is command-only like drift:
+  discussing the rule against it), and an unauthorized decision never
+  feels unauthorized from the inside — it feels like progress. whoa is
+  command-only like drift:
   skills/whoa/ deleted, protocol lives in commands/whoa.md. The
   command-vs-skill reasoning above described a mechanism that never fires.
 - `drift` = merged re-anchor + remind-gate command, command-only, no skill.
@@ -70,8 +69,8 @@ one name, which is evidence it's the right principle.
 - session-handoff → `handoff`; check-in → dissolved into whoa;
   missing-software → `missing-tool`; commits → `git` (widened);
   gate-failure → `red` (see naming principle below). step-gate
-  relocates to unifractured `.agents/commands/` (references fa-quality-review,
-  a project skill; global command calling project content breaks layering).
+  relocates to another repo (references a project skill; global command calling
+  project content breaks layering).
 - Two base skills split by trigger moment: `handoff` (session ending,
   pausing, starting — the flow) and `agent-notes` (creating/editing
   .agent-notes files — the format). One skill with both triggers would have
@@ -80,7 +79,7 @@ one name, which is evidence it's the right principle.
 ### Git policy — the publication boundary
 
 Discovery: `git push*` was `ask` in global config, so agents could attempt
-push and unifractured's pre-push lefthook chain (notes-lint →
+push and another repo's pre-push lefthook chain (notes-lint →
 duplicate-methods → quality → full rspec, piped, serial) ran inside one
 agent tool call and timed out. That was the "lefthooks fire and requests
 time out" mess.
@@ -104,7 +103,7 @@ time out" mess.
   `--no-verify` or
   `LEFTHOOK=0` (skipping the check is worse than waiting), one line and
   wait. Phrased generically (hooks, check runners) — lefthook specifics
-  stay FA-side.
+  stay in the other repos.
 - commits widens to `git`: trigger "when git structure is at stake —
   commits, branches, pushes, PRs." Carries the existing commit protocol
   (exact files + message, question-tool approval, never widen) plus
@@ -121,7 +120,7 @@ The public tree never contains session ephemera.
   close-out. Always the current session state. Fixed address kills the
   failure-class the old design defended against: newest-file resolution,
   the archive-before-successor race, "point at the latest handoff must
-  resolve" as a close-out check. fa-agent-notes' line "a handoff in
+  resolve" as a close-out check. The other repo's notes skill line "a handoff in
   sessions/ is the live plan until its successor exists" becomes
   structurally true. Name: handoff.md (names the artifact by role; no
   slugs, no variants).
@@ -131,8 +130,8 @@ The public tree never contains session ephemera.
   is state narrative nobody reads in a week ("what is archive other than
   past sessions?" — nothing). The month window is a decay buffer for
   hitting issues.
-- `.agent-notes/personal/` — scratch, gitignored. Named `local/` in FA's
-  original convention; renamed Nov 5 — the axis is personal vs shared, and
+- `.agent-notes/personal/` — scratch, gitignored. Named `local/` in the
+  another repo's convention; renamed Nov 5 — the axis is personal vs shared, and
   `local` collides with git's clone-local meaning. `skills/personal/` is
   the incumbent word.
 - Root notes — tracked living docs, the durable layer, frontmatter
@@ -152,8 +151,8 @@ The public tree never contains session ephemera.
   sessions/, personal/ exempt. summary kept but repurposed: the agent-facing
   triage line (how an opening act or weekly review decides which note to
   open at one line of context), NOT a human display field. Archaeology:
-  the report never displayed summary in any version — the fa-agent-notes
-  claim that it does was false from birth; RSL confirmed summaries are
+  the report never displayed summary in any version — the other repo's
+  notes-skill claim that it does was false from birth; the user confirmed summaries are
   visual noise in a TOC. Tripwire: if summaries go stale or no agent acts
   on one, drop the field in a later pass — the consumer argument is
   currently speculative.
@@ -161,8 +160,8 @@ The public tree never contains session ephemera.
 ### Notes tooling — agency CLI and bin/notes
 
 - `bin/notes` — standalone Ruby, stdlib only (YAML, Open3), ported from
-  unifractured's notes.rb + notes_report.rb, merged. Invoked through the
-  agency CLI (RESOLVED Nov 6, RSL: one PATH entry point, `agency notes ...`,
+  another repo's notes tooling, merged. Invoked through the
+  agency CLI (RESOLVED Nov 6, user decision: one PATH entry point, `agency notes ...`,
   replacing a standalone `notes` link): `agency notes report` (grouped TOC:
   status sections, date, path — NO summary column, minimal by design),
   `agency notes stale` (90-day default, includes the personal/ section),
@@ -170,20 +169,20 @@ The public tree never contains session ephemera.
   the port printed problems but exited 0), `agency notes format` (autofill,
   review the diff). Pastel → plain ANSI. Lint scope narrows to root notes
   (durable layer only). Ruby floor: 4.0+ via any version manager (Nov 6,
-  RSL: 2.6 compat rejected; in-file version guard rejected as dead code —
+  user decision: 2.6 compat rejected; in-file version guard rejected as dead code —
   old Rubies die at parse time — so the requirement is codified in docs
   only). `bin/agency install` links `agency` into `~/.local/bin`.
 - `agency notes expire` — replaces the planned `gc` subcommand (RESOLVED
-  Nov 6, RSL: "gc" names the mechanism, not the act, and flag-driven mass
+  Nov 6, user decision: "gc" names the mechanism, not the act, and flag-driven mass
   delete had no review). Lists `sessions/` docs older than N days (default
   30) with date + derived summary; deletion requires naming exact files
   (`expire -- <file> ...`), refused outside sessions/ — review by
   construction, no force flag. Agent flow: relay the listing (question-tool
   options with date/summary), user decides.
-- FA delta: unifractured's four rake tasks become transition wrappers over
+- Downstream delta: the four rake tasks become transition wrappers over
   `agency notes`, then die; lefthook pre-push calls `agency notes lint`
   directly. The TOC/staleness reporting moves to base wholesale (nothing in
-  it was FA-specific — Pastel was the only coupling).
+  it was specific to the other repos — Pastel was the only coupling).
 
 ### Agents — write carve-outs
 
@@ -200,7 +199,7 @@ The public tree never contains session ephemera.
   NOT in a global opencode directory. Scratch and destination in one place,
   per-project, visible to notes tooling. The global `~/.opencode/plan`
   dissolves (or stays as legacy fallback). See plan-mode mechanism below.
-  RESOLVED Nov 6 (RSL): category directory beats the earlier `plan-*.md`
+  RESOLVED Nov 6 (user decision): category directory beats the earlier `plan-*.md`
   slug-at-root convention — permission boundaries align with directories
   exactly, while filename prefixes are approximate under V2 globs (`*`
   crosses `/`), and the directory gives plans a real home as
@@ -235,84 +234,25 @@ with the competing reminder; (c) tolerate the conflict — the reminder's own
 direction precedence, which is how this session worked. RESOLVED Nov 5:
    custom-agent sidestep — see the forks section.
 
-### Saved permission approvals (discovered + wiped, Nov 6 2026)
+### Saved permission approvals (mechanism)
 
 opencode's "always" reply on a permission ask is NOT session-scoped: it
-writes a permanent row to `~/.local/share/opencode/opencode.db`
-(`permission` table, keyed by project), layered into every future
-session's ruleset before the ask fires. Saved allows override config
-asks indefinitely; config *denies* still win (cannot be overridden by
-any allow). Discovered because a planning agent's `rm` ran with no
-prompt — a mid-Oct `rm *` "always" for langafile pre-approved it.
+writes a permanent row to the harness DB (`permission` table, keyed by
+project), layered into every future session's ruleset before the ask
+fires. Saved allows override config asks indefinitely; config *denies*
+still win (cannot be overridden by any allow). A broad saved allow can
+silently defeat a whole tuned ask layer — audit the table periodically,
+and treat "always" as a deliberate, per-project, permanent grant.
 
-Consequence found by audit: 704 saved rows across ~30 projects silently
-defeated the tuned ask layer — `rm *`/`rmdir *` in six projects
-(including home), `bash *`/`zsh *`, `curl *` (×10), `ssh *`, `mv`,
-`chmod`, `git reset`, `osascript *`, `node *`, `eval *`, `. *`, an
-`edit|*` allow, plus three `psql` rows embedding plaintext production
-RDS credentials (fa-warehouse-bi connection strings — rotation
-recommended; named in-session, not recorded further). Wiped Nov 6
-(RSL: remove ALL previous choices): table zeroed after a dump backup at
-tmp/permission-backup-2026-11-06.sql; live immediately (assert queries
-the DB per check, no cache). Going forward "always" is a deliberate,
-per-project, permanent grant — spend it accordingly.
-
-### New-session TTFT under oMLX (investigated, Nov 6 2026)
-
-Symptom: a new session's first token takes 21.5s (one active session),
-66.8s (two-plus active), vs 1-3s for warm sessions at any context size
-(175k+ contexts stay fast — only the suffix prefills).
-
-Mechanism (from oMLX source + server log, not speculation): prefill is
-chunked and yields to active decode — "decode fairness" (scheduler.py
-~1774, issues #2031/#2622). Each prefill chunk accrues a decode time
-debt repaid before the next chunk; contended chunks cap at 512 tokens
-(64-token grid, 500ms decode-stall target). Default debt ratio 0.5 →
-decode holds ~1/3 wall time, documented as the measured M3 Ultra sweet
-spot. Measured effective contended prefill: ~200-300 tok/s (26k tokens
-took 89.5s with three concurrent decoders; 15k took 21.5s with one).
-Raw prefill is fast; the stretching is scheduling, not hardware.
-Decode also drops (~45 → ~20 tok/s) under the same contention — the
-system balances both directions.
-
-Levers (admin API `POST /api/global-settings`, also the oMLX app UI):
-- `decode_fairness: false` — prefill stops yielding; new sessions get
-  fast TTFT, active decodes stall more.
-- `prefill_priority: "speed"` — memory guard stops shrinking prefill
-  chunks (bigger chunks, faster prefill, more transient memory).
-Behavioral alternative: start new sessions when heavy sessions idle.
-RESOLVED Nov 6 (RSL): BOTH flipped via the live admin API
-(`POST /admin/api/global-settings`, main API key as bearer; persists to
-file across restarts — server log confirms both lines): decode_fairness
-false at 08:49, prefill_priority "speed" at 09:01. Verified by GET.
-Watch-item: server log for memory-guard/eviction activity after big
-prefill bursts (speed never shrinks chunks; MoE prefill transients run
-tens of MB/token) — revert to "context" via the same API call if it
-appears. Note: restarting oMLX Sr. kills this session's own model
-provider — changes were deliberately made live, not via restart.
-
-### WORKFLOW.md restructure
+### Workflow-doc restructure (machine-local)
 
 Lineup section reorganized lifecycle-first (start → do → react → punt →
 close). Vocabulary rule at top. Overnight marked parked, not deleted from
 history. Plan mode added to the lineup (project-relative plan docs, the
 research/plan distinguisher, the replace-vs-append permission semantics).
-TIGHTENING.md stays the pruning reference; WORKFLOW.md stays the design
-reference. Layering rule stated: overrides carry deltas, never re-state
+The pruning and workflow-design references stay in the machine-local
+layer. Layering rule stated: overrides carry deltas, never re-state
 the base — the drift lesson from the two divergent handoff lifecycles.
-
-## Repo home — moved to ~/dev/agency (Nov 5 2026, RSL decision)
-
-The tree now lives at `~/dev/agency`; `~/.agents` is a symlink to it. Every
-hardcoded discovery path keeps working through the chain
-(`~/.config/opencode/agents` → `~/.agents/agents` → `~/dev/agency/agents`),
-verified via bin/agency's `:A` resolution and a sweep for other inbound
-links (none — only the two opencode links). bin/agency derives REPO from its
-own script path, so it works from the real location. Rationale: the repo
-belongs among the dev trees like every other project; the symlink decouples
-"where the tree lives" from "where harnesses hardcode discovery". Docs
-referring to the `~/.agents` convention stay valid — the path still exists,
-as the shim.
 
 ## Phase 0 — config (DONE, Nov 5 2026)
 
@@ -345,7 +285,7 @@ Files:
 - commands/whoa.md — update: loads the whoa skill.
 - commands/re-anchor.md + remind-gate.md → merged into commands/drift.md;
   remind-gate deleted.
-- commands/step-gate.md → move to ~/dev/fa/unifractured/.agents/commands/
+- commands/step-gate.md → move to another repo's agent content
   (verify opencode discovers project-level .agents/commands first; if not,
   keep global with a comment).
 
@@ -353,7 +293,7 @@ Verification: grep the tree for stale references (check-in,
 session-handoff, missing-software, gate-failure, commits skill, re-anchor,
 remind-gate). In-agency ripples: README.md line 17 (re-anchor → drift),
 specs/SKILL.md's reference line (rewrites around "the red skill").
-Project-repo references are FA-side ripple, not this phase.
+Other-repo references are their own ripple, not this phase.
 
 ## Phase 2 — notes system in agency — DONE Nov 5
 
@@ -374,19 +314,19 @@ Files:
   (title optional/derived, status enum, summary required as agent-triage
   line — explicitly NOT displayed in report), naming rules (dated for
   point-in-time dirs, undated root docs), bin/notes usage, lint scope =
-  root notes only. Base for the FA delta.
+  root notes only. Base for the other repos' delta.
 - bin/notes — port per tooling decisions.
 - bin/agency — add `gc` subcommand; update usage text.
 - AGENTS.md (agency) — the two pointer lines per the skill's
-  project-parameters requirement (pointer + registry path; lean WORKFLOW.md
-  as the meta-repo's registry).
+  project-parameters requirement (pointer + registry path; the meta-repo's
+  registry lives in the machine-local workflow doc).
 - README.md (agency) — layout gains .agent-notes/ and bin/notes; "using
   it" gains gc/notes commands.
 
 Verification: bin/notes lint/report/stale against the fresh .agent-notes;
 gc dry-run; gitignore effect (handoff.md absent from git status).
 
-## Phase 3 — git policy prose — DONE Nov 5 (duet.md behavior-only; slogan skipped per RSL, lives in skills/git)
+## Phase 3 — git policy prose — DONE Nov 5 (duet.md behavior-only; slogan skipped, lives in skills/git)
 
 - agents/duet.md — git-structure section: one session = one branch = one
   purpose (set by user at kickoff); never branch/worktree/PR mid-session;
@@ -410,7 +350,7 @@ gc dry-run; gitignore effect (handoff.md absent from git status).
   agent config from its load-time cache; debug/agents reads inside that
   project showed stale content until the server cycle.
 
-  SUPERSEDED Nov 6 (RSL, same day): `.agent-notes/*` included the
+  SUPERSEDED Nov 6 (user decision, same day): `.agent-notes/*` included the
   ephemeral layers (sessions/, personal/, handoff.md) — a hole. Taxonomy
   resolved as category-dirs-by-writer: root = duet/harness-written
   durable notes; plans/ = planning's intent docs; research/ = research's
@@ -426,46 +366,48 @@ gc dry-run; gitignore effect (handoff.md absent from git status).
   lands last: `edit *` deny → `.agent-notes/research/*` allow);
   why-agents-edit.md migrated; bin/notes scans the durable layer
   (root + plans/ + research/) for report/stale/lint/format — lint widened
-  to category dirs per RSL's call, clean on first run. Live boundary test
+  to category dirs per the user's call, clean on first run. Live boundary test
   VERIFIED Nov 6 (research switch): research/ write succeeded
   (research/notes-permission-mechanics.md — consolidated permission-chain
   findings), deliberate probe outside research/ denied by the frontmatter
   `edit *` deny, no reminder noise on the switch. Window closed.
 
-## Phase 5 — WORKFLOW.md + ripples
+## Phase 5 — workflow-doc restructure + ripples
 
-  AGENCY-SIDE DONE Nov 6 2026: WORKFLOW.md restructure landed (vocabulary
+  AGENCY-SIDE DONE Nov 6 2026: the machine-local workflow-doc restructure
+  landed (vocabulary
   rule, lifecycle-first lineup against the on-disk agents/skills/commands,
   plan-mode entry with the permission semantics, layering rule, overnight
-  history compressed per RSL's call — yOLO-removed entry, overnight lineup
+  history compressed per the user's call — yOLO-removed entry, overnight lineup
   item, overnight-plan skill, and the 90-line run section folded into one
   history block; the registry section survived verbatim). Ripple sweep
   verified clean: agency tree, README, and skills/personal carry no stale
   renamed-skill references; step-gate already carries the fork-4
   dependency comment; the only per-project rows left (weekly-review's
-  Comrade/LangaFile notes-layout notes) belong to those repos, not
-  agency. Scope decisions Nov 6 (RSL): FA-side work stays out of this
-  pass (own session); the research/ shape keeps its own window.
+  the per-project notes-layout notes) belong to those repos, not
+  agency. Scope decisions Nov 6 (user): other-repo work stays out of
+  this pass (own session); the research/ shape keeps its own window.
 
-- WORKFLOW.md (~/.config/opencode/) — DONE (see above).
+- Workflow doc (machine-local) — DONE (see above).
 - Sweep ripples — DONE, verified clean.
-- FA-side work (SEPARATE repo pass, still open): fa-agent-notes shrinks to
-  delta; unifractured lefthook pre-push notes-lint → `agency notes lint`
+- Downstream work (SEPARATE repo pass, still open): the notes skill shrinks
+  to delta; the lefthook pre-push notes-lint → `agency notes lint`
   (fork 1 resolved: gem-side notes-lint moves out entirely, no ported
-  copy, no transition wrappers — exact shape per RSL's unifractured-side
-  note); unifractured AGENTS.md pointer line session-handoff → handoff;
-  unifractured .agent-notes/sessions/ committed-docs migration decision
-  (FA's call, per-project parameter); step-gate gem-side relocation;
-  unifractured .agent-notes/local/ → personal/ rename (agency renamed
-  Nov 5; FA-side dirs are the migration tail).
+  copy, no transition wrappers — exact shape per a note in that repo
+  note); AGENTS.md pointer line session-handoff → handoff;
+  sessions/ committed-docs migration decision
+  (their call, per-project parameter); step-gate gem-side relocation;
+  local/ → personal/ rename (agency renamed
+  Nov 5; their dirs are the migration tail).
 
 ## Open forks (decide at execution)
 
 1. **Lint canonical home** — RESOLVED Nov 5: canonical in agency
-   (`bin/notes`), full stop. RSL added a note in unifractured to move the
-   gem-side notes-lint out entirely — no ported copy, no transition
-   wrappers, so the drift concern doesn't arise. Unifractured-side work
-   (removal + lefthook retarget) is tracked by that note, not this repo.
+   (`bin/notes`), full stop. A note in that repo moved the
+   move the gem-side notes-lint out entirely — no ported copy, no
+   transition wrappers, so the drift concern doesn't arise. Downstream
+   work (removal + lefthook retarget) is tracked by that note, not this
+   repo.
 2. **Reminder-text fix** — RESOLVED Nov 5, IMPLEMENTED Nov 6: custom-agent
    sidestep. The built-in reminder is hardcoded in core and self-healing
    (plan.ts's `session.hook("context")` reconciler re-appends it when
@@ -487,21 +429,26 @@ gc dry-run; gitignore effect (handoff.md absent from git status).
    (not needed), TUI plan shortcut still targets the hidden built-in.
    Outstanding: first live planning session — confirm no plan reminder
    and .agent-notes/ writes work (verification item below).
-3. **Agency's open-items registry path** — RESOLVED Nov 5: WORKFLOW.md
-   (`~/.config/opencode/`), per the lean. Recorded in this repo's
+3. **Agency's open-items registry path** — RESOLVED Nov 5: the
+   machine-local workflow doc, per the lean. Recorded in this repo's
    AGENTS.md "Notes and handoffs" section.
 4. **step-gate project-commands discovery** — RESOLVED Nov 5 against the
    opencode source (tmp/opencode checkout): commands are scanned only in
    config Directory entries — system/global config dirs and project
    `.opencode/{command,commands}/` roots. Project `.agents/` dirs feed the
    skills compatibility plugin only, so the plan's assumed target
-   (unifractured `.agents/commands/`) would never load. Resolution: step-gate
-   stays global with a dependency comment. It is NOT unifractured-specific —
-   fa-quality-review is gem-distributed to all seven FA apps (billing et al.
-   carry the same .agents-fa/ set via the gem ref), and meaningless outside
-   the FA family. The durable home is gem-side (shipped alongside the skill
-   in .agents-fa/), not per-app — per-app copies are the drift fa/AGENTS.md
-   warns about. Relocation belongs to the Phase 5 FA pass.
+   (another repo's `.agents/commands/`) would never load. Resolution: step-gate
+   stays global with a dependency comment. It is NOT specific to one repo —
+   the quality-review skill ships via a gem to a family of apps, and is
+   meaningless outside them. The durable home is gem-side (shipped
+   alongside the skill), not per-app — per-app copies are the drift the
+   family's shared AGENTS.md warns about. RESOLVED Nov 6 2026 by
+   absorption: the re-entry behavior folded into the quality-review
+   skill's step 3 (skip to the group walk when
+   findings are already on screen); the agency command deleted, no
+   separate step-gate skill — a second name for a sub-step fails the
+   vocabulary rule. Commands could never load gem-side anyway (fork's
+   discovery finding), which is what made absorption the only clean shape.
 
 ## Verification items
 
@@ -520,11 +467,12 @@ write.
 
 ## Explicitly out of scope
 
-- overnight agent file — parked Nov 5 (RSL: don't want it now). BUILT Nov 6
+- overnight agent file — parked Nov 5 (user: don't want it now). BUILT Nov 6
   as `yolo` with a different entry (in-session agent switch, no plan doc, no
-  runner flags) after RSL asked for night runs back — see WORKFLOW.md lineup
+  runner flags) after the user asked for night runs back — see the
+  workflow doc's lineup
   + the yolo open items. This bullet is history, not a live constraint.
 - Renaming duet/research/review.
-- ~/.config/opencode/skills/ empty dir — RSL's opencode-local skills slot,
+- ~/.config/opencode/skills/ empty dir — the user's opencode-local skills slot,
   stays.
-- Any FA repo migration — separate pass, listed in Phase 5.
+- Any other-repo migration — separate pass, listed in Phase 5.

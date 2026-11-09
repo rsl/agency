@@ -13,6 +13,20 @@ Personal rules live in a separate machine-local file (never committed) and load 
 - State this session didn't cause or expect (files changed, keys exist, values off): ask "did you edit this?" before hunting for provenance.
 - Report scan findings, don't fix unasked — including gate failures and findings in code written this session. Report with options and a recommendation; fix only on explicit approval.
 
+## Commits
+
+- Never commit without asking. A commit happens only on the developer's
+  explicit word addressed at committing; approval to build, verify, or
+  finish never licenses one. When in doubt, bring the work and stop
+  short of the commit.
+- Granular commits — one logical unit each. A follow-up belonging to
+  the last commit amends it (`git commit --amend`, unpushed only);
+  anything else is a new commit. Never amend a pushed commit. No fixup
+  commits, no autosquash, no rebase.
+- Batch small changes and bring them as one ask. The uncommitted state
+  gets named when the work is delivered, once — no reminders after
+  that.
+
 ## Communication
 
 - Lead with the answer; no warm-up, no closers, no filler.
@@ -22,6 +36,7 @@ Personal rules live in a separate machine-local file (never committed) and load 
 - Markdown: one paragraph, bullet, or sentence per line — let editors soft-wrap.
 - Skill frontmatter: `description` unquoted when possible, single quotes otherwise.
 - Match the register to the reader — casual with the user; for anyone else, whatever fits them.
+- Pointers to state: a full URL (or path) plus a name, never a bare id — machinery gets its file path. Applies in conversation, handoffs, and docs alike.
 
 ## Context economy
 
@@ -39,15 +54,22 @@ Personal rules live in a separate machine-local file (never committed) and load 
 - Never print environment variable *values* (`printenv`, bare `env`, `echo $SECRET`) — output lands in the session log. To check a var exists: `test -n "$VAR"`. Any command likely to emit secrets is ask-first. Names-only listing goes through `cut -d= -f1`.
 - Secret-bearing files (`.env*`, config dumps): ask before reading or matching; if approved, names only — grep specific keys, never whole lines. Never pipe them anywhere.
 - Real credentials in tool output: name it in-session — what leaked, where — and never write the incident into notes, handoffs, or registries.
+- The developer's name never lands in tracked files — notes, docs, code comments. "Developer" (or "dev") means the human developer; end users are "users" or "end users". Attribution reads "the developer" or "developer decision". Machine-local config says to *address* the developer by name; that never means *record* it.
 - Scratch files go in the project's `tmp/`, never a system temp dir.
 - File changes go through `edit`/`write` only — shell one-liners mangle formatting. Target exact anchors over rewrites; after two failed edits, re-read and widen.
 - Shell read commands: one command per call, batched as parallel tool calls. Drop command substitutions `$(...)` and fd redirects like `2>/dev/null` from read commands, and let stderr show rather than suppressing it.
 - Some shells (notably zsh, the default on macOS) abort the whole line on a failed glob ("no matches found") — later commands never run, so "not found" may mean the search never ran. List files explicitly or guard globs.
+- Search tools with hidden-default-false silently skip dot-paths: a pattern crossing `.agent-notes/` (or any dot-directory) returns empty as if the path didn't exist. Point the search root at the dot-directory, or set `hidden: true`. An absence claim needs a positive probe — a silent-empty result is a tool artifact, not evidence.
 
-## Notes and handoffs (this repo)
+## Notes and handoffs (every project)
 
-Session handoffs follow the handoff skill; state lives in
-`.agent-notes/handoff.md` (gitignored, overwritten at close-out). Open-items
-registry: `.agent-notes/open-items.md`. Notes tracking:
-root `.agent-notes/` docs are tracked; `handoff.md`, `sessions/`, and
-`personal/` are gitignored.
+Session handoffs follow the handoff skills, in whatever project the
+session works in: reading/opening per `handoff-read`, writing/close-out
+per `handoff`. State lives in that project's
+`.agent-notes/handoff-<branch>.md` — one gitignored file per in-flight
+branch, written and overwritten at that branch's close-outs. Each
+project declares its own two parameters (registry path,
+notes-tracking policy) in its AGENTS.md or `.agent-notes/README.md`.
+
+Agency itself: registry `.agent-notes/open-items.md`; root `.agent-notes/`
+docs are tracked; `handoff-*.md`, `sessions/`, and `personal/` are gitignored.

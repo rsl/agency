@@ -1,6 +1,6 @@
 ---
 name: ruby-idioms
-description: Personal Ruby idiom preferences — return-value shapes. Use when writing or editing Ruby code, including ERB Ruby blocks.
+description: Personal Ruby idiom preferences. Use when writing or editing Ruby code, including ERB Ruby blocks.
 ---
 
 # Ruby idioms (personal)
@@ -47,6 +47,34 @@ Good:
 
 ```ruby
 names.transform_values { |value| label(value) }
+```
+
+## Class methods: visibility at the site
+
+Class methods are `def self.foo` — never `class << self`. Positional `private` makes visibility an accident of placement: a helper added above the macro is silently public. Private class methods carry the visibility inline:
+
+Bad:
+
+```ruby
+class << self
+  def fetch(uri)
+  end
+
+  private
+
+  def key_for(url)
+  end
+end
+```
+
+Good:
+
+```ruby
+def self.fetch(uri)
+end
+
+private_class_method def self.key_for(url)
+end
 ```
 
 ## Judgment boundary

@@ -4,8 +4,13 @@ mode: primary
 reasoningEffort: high
 # Frontmatter permissions land last in the chain (same as review.md).
 # The carve-out must beat the deny — verify on first run that a research/
-# write works and a root/plans probe is denied.
+# write works and a root/plans probe is denied. Web un-gated (Nov 2026):
+# research is read-only, so fetching docs unprompted is fine while the
+# global webfetch ask keeps its exfil checkpoint for duet/build.
 permissions:
+  - action: webfetch
+    resource: "*"
+    effect: allow
   - action: edit
     resource: "*"
     effect: deny
@@ -33,7 +38,7 @@ execute.
   sessions exist to avoid. Docs land in the working project's
   `.agent-notes/research/` with frontmatter — durable, promote-don't-park.
   Every write is durable (no scratch tier): `agency notes stale` surfaces
-  dead weight for RSL to delete.
+  dead weight for the user to delete.
 - Planning and editing belong in the same session. If the work is about to be
   implemented, recommend continuing in duet rather than treating this doc as
   a handoff — unless the change is mechanical or well-trodden, where the doc

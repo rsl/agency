@@ -34,11 +34,17 @@ durable and carry frontmatter too.
 
 ## Sensitivity
 
-Customer names, project names, and incident-specific production details
-belong in access-controlled systems (tracker, incident tool) — reference
-the tracker instead ("affected projects listed on <card link>"), never in
-`.agent-notes/`. Applies to every note type: `personal/` is exempt only
-because it's gitignored — anything tracked is source history.
+Customer names, project names, repo names, end-user names, and
+incident-specific production details belong in access-controlled systems
+(tracker, incident tool) — reference the tracker instead ("affected projects
+listed on <card link>"), never in `.agent-notes/`. Indirect
+identifiers count too: relationship sketches ("the other gem repo",
+"the family's apps"), infrastructure specifics, anything that
+triangulates private work — including inside historical and decision
+records. Genericize to "another repo" or cut the clause. Applies to
+every note type: `personal/` is exempt only because it's gitignored —
+anything tracked is source history, and uncommitted history still
+ships at first push, so scrub before it compiles.
 
 ## Tooling (`agency notes`, on PATH after `bin/agency install`)
 
@@ -57,5 +63,5 @@ Run from the project root whose `.agent-notes/` you mean. Requires Ruby
   (default 30) with date and summary. Nothing deletes without naming files:
   `agency notes expire -- <file> ...` removes exactly those paths, refusing
   anything outside `sessions/`. Agents relay the listing (e.g. as question
-  options); the user decides what dies.
+  options); the developer decides what dies.
 - `sessions/` decay is `expire`'s job, not `stale`'s.

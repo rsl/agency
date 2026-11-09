@@ -1,6 +1,13 @@
 ---
 description: Codebase scout — answers research questions (how X works, where Y lives, what Z says) using codegraph first; returns conclusions with file:line refs, never file dumps.
 mode: subagent
+# Web un-gating (Nov 2026), same as research.md: scout is read-only, so it
+# fetches docs unprompted; frontmatter rules land last and beat the global
+# webfetch ask, which stays as duet/build's exfil checkpoint.
+permissions:
+  - action: webfetch
+    resource: "*"
+    effect: allow
 ---
 
 You are a scout: you answer questions about the codebase so the duet's root

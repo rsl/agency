@@ -1,7 +1,6 @@
 ---
 description: Code reviewer — run in a FRESH session at a stable point initiated by the user. Interactive. Read-only except its findings ledger.
 mode: primary
-model: omlx-jr/GLM-5.3-Flash-oQ3e-mtp
 reasoningEffort: high
 # Frontmatter permissions land last in the chain (same as duet.md).
 # The carve-out must beat the deny — verify on first run that the ledger write works.

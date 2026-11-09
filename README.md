@@ -40,10 +40,12 @@ untracked layer, never committed here.
 
 ## Using it
 
-Point your harness at this checkout (most discover `~/.agents/skills` and
-`AGENTS.md` automatically), then run:
+Clone this repo anywhere, then point your harness at the checkout. The
+convention most harnesses discover automatically is `~/.agents` — create
+it if it doesn't exist:
 
 ```sh
+ln -s "$PWD" ~/.agents
 bin/agency install opencode   # or whichever harness you use
 bin/agency status opencode
 agency notes report           # TOC over .agent-notes/ (also: stale, lint, format)
@@ -51,9 +53,13 @@ agency notes expire           # list sessions/ docs older than 30 days
 agency notes expire -- FILE   # delete exactly the named sessions/ files
 ```
 
-Add your own machine-local rules file and `skills/personal/` entries; keep
-anything identifying, secret-bearing, or single-machine out of the shared
-tree.
+The machine-local rules file and `skills/personal/` entries are optional —
+a fresh clone with neither works; they exist so you can add rules and
+skills you don't want in the shared tree. Some agents carry deny rules
+for MCP servers used in the original setup (for example `doop`, `things`);
+in a setup without those servers the rules are dead entries and nothing
+depends on them. Keep anything identifying, secret-bearing, or
+single-machine out of the shared tree.
 
 ## License
 

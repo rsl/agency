@@ -13,7 +13,7 @@ and analyze what it shows. If the user's message adds a question or focus
 ($ARGUMENTS), answer it about that file.
 
 Anti-stale law: earlier in a session a "newest screenshot" lookup has grabbed
-an older file (numbered copies like "Langafile 8.png" sit next to older
+an older file (numbered copies like "something 8.png" sit next to older
 "Copied" names, and glob failures have skipped the search entirely). Never
 reuse a Desktop path from earlier in the session — the listing above is the
 only truth.

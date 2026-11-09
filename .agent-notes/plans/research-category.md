@@ -37,7 +37,7 @@ ephemeral layer.
 `personal/` — both denied under the new shape. Rather than re-open a
 scratch channel, research's home becomes all-durable: every doc lands in
 `research/` with frontmatter, and `agency notes stale` surfaces dead
-weight for RSL's deletion call (no expire mechanism for research/ — add
+weight for the user's deletion call (no expire mechanism for research/ — add
 one only if the dir actually accumulates junk). Reason: the scratch/derive
 split was solving a clutter problem that `stale` already solves at the
 durable layer, and two write tiers per agent doubles the permission surface
@@ -84,7 +84,8 @@ dirs — no upside found.
 4. **Doc ripples** — skills/agent-notes SKILL.md: taxonomy paragraph
    (category dirs by writer, research/ added, "Planning-agent writable;
    everything else is not" rephrased), lint scope line per fork,
-   tooling lines ("root notes only" → durable layer). WORKFLOW.md
+   tooling lines ("root notes only" → durable layer). The machine-local
+   workflow doc's
    registry entry: why-agents-edit path update. orchestration.md Phase 4
    SUPERSEDED note: marked implemented by this plan. Agency README: only
    if its .agent-notes/ description names the layout (check at execution).
@@ -99,11 +100,12 @@ dirs — no upside found.
 - `agency notes report`, `stale`, `lint` from the agency root: research/
   and plans/ docs present, why-agents-edit listed under its new path,
   lint green.
-- WORKFLOW.md registry path updated and grep-clean of the old path.
+- Machine-local workflow doc's registry path updated and grep-clean of
+  the old path.
 
 ## Out of scope
 
 - `plans/` write permissions (planning agent already scoped correctly).
-- Any expire mechanism for research/ (decided above: stale surfaces, RSL
-  deletes).
-- FA-side notes migration (Phase 5's separate pass).
+- Any expire mechanism for research/ (decided above: stale surfaces, the
+  user deletes).
+- another repo's notes migration (Phase 5's separate pass).

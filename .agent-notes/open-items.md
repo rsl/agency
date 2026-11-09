@@ -7,33 +7,24 @@ summary: The project's open-items registry — promoted from session handoffs; e
 # Open items
 
 Promoted from session handoffs per the handoff skill. Machine-local items
-stay in `~/.config/opencode/WORKFLOW.md` — this file is tracked in a public
-repo and must not carry machine-specific details.
+stay in the machine-local workflow registry — each checkout's own
+machine-local layer — never here: this file is tracked in a public repo
+and must not carry machine-specific details.
 
-- **Phase 5 — agency-side DONE Nov 6 2026** (WORKFLOW.md restructure:
-  vocabulary rule, lifecycle-first lineup, plan-mode entry, layering rule,
-  overnight history compressed; ripple sweep verified clean — agency tree,
-  README, weekly-review carry no stale references). Remaining: **FA-side
-  pass, separate session** — fa-agent-notes shrinks to delta; unifractured
-  lefthook pre-push retargets to `agency notes lint` (gem-side notes-lint
-  moves out entirely, no transition wrappers, per fork 1); unifractured
-  AGENTS.md pointer line session-handoff → handoff; unifractured
-  .agent-notes/sessions/ committed-docs migration decision (FA's call);
-  step-gate gem-side relocation; unifractured .agent-notes/local/ →
-  personal/ rename. Details: `.agent-notes/plans/orchestration.md`
-  Phase 5 section.
-- **Planning-agent live verification — RESOLVED Nov 6 2026** (live session:
-  no plan reminder injected on switch, `.agent-notes/plans/` write landed
-  — plans/research-category.md authored by the planning agent — hidden
-  built-in `plan` absent from the TUI cycle). Details:
-  `.agent-notes/plans/orchestration.md` Verification items.
-- **Meta-decision: tighten-calibration rule in duet.md — DECIDED Nov 6
-  2026 (RSL)**: codified as one line in duet's plan-gate section —
-  imperatives approve restatement kills only, judgment calls propose-wait,
-  verify against the tree before claiming done. One line by design; a
-  paragraph would be the accretion bias the rule guards against.
-- **Research question: `.agent-notes/research/why-agents-edit.md`** —
-  open, untouched since Nov 5 (migrated to research/ Nov 6).
+- **Phase 5 — DONE Nov 6 2026, both sides.** Agency-side: the
+  machine-local workflow-doc
+  restructure (vocabulary rule, lifecycle-first lineup, plan-mode entry,
+  layering rule, overnight history compressed), ripple sweep clean. The
+  other repos' pass landed the same day and is tracked in their own
+  registries — agency carries none of that content and no
+  open items for it. History: `.agent-notes/plans/orchestration.md`
+  Phase 5.
+- **Post-hoc collaboration audit** — open buildable idea, salvaged Nov 9
+  2026 from the deleted why-agents-edit research note: the agent can't
+  notice its own rule decay (whoa's self-catch has never fired), but the
+  transcript always shows the unauthorized decisions — hooks or audit
+  passes that make the transcript review itself get collaboration
+  without needing to fix the want.
 - **yolo first live night** — low-stakes fence, verify: zero prompts all
   night, night-queue.md written when a would-be ask arises, clean stop with
   handoff, morning read coherent. TUI verified Nov 6 (visible in a fresh
