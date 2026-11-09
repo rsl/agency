@@ -12,17 +12,19 @@
 #                         plans/ + research/)
 #   notes stale [days]    durable notes untouched for N days (default 90);
 #                         personal/ listed separately
-#   notes lint            missing/invalid frontmatter on durable notes —
-#                         non-zero exit on any problem (hook-friendly)
-#   notes format          autofill missing frontmatter fields; review the diff
+#   notes lint            frontmatter validity + hard-wrapped prose on
+#                         durable notes — non-zero exit on any problem
+#                         (hook-friendly)
+#   notes format          autofill frontmatter and reflow hard-wrapped prose
+#                         (paragraphs, bullets, blockquotes); review the diff
 #   notes expire [days]   list sessions/ docs older than N days (default 30)
 #   notes expire -- f...  delete exactly the named sessions/ files — review
 #                         by construction; nothing is deleted by a flag
 #
 # Scope: the durable layer is root notes plus the category dirs (plans/,
-# research/). handoff.md, sessions/, and personal/ are the ephemeral layer —
-# exempt from lint/format; sessions/ decay is `agency notes expire`'s job
-# (listing + named-file deletion).
+# research/). handoff-<branch>.md, sessions/, and personal/ are the ephemeral
+# layer — exempt from lint/format; sessions/ decay is `agency notes expire`'s
+# job (listing + named-file deletion).
 #
 # Requires Ruby 4.0+ (chruby, rbenv, mise, asdf, ...). Older Rubies,
 # including macOS system Ruby 2.6, will not parse this.
@@ -34,9 +36,10 @@ require 'yaml'
 
 STATUSES = %w[active parked done].freeze
 NOTES_DIR = '.agent-notes'
-HANDOFF = 'handoff.md'
+HANDOFF_PATTERN = /\Ahandoff(-.+)?\.md\z/
 CATEGORY_DIRS = %w[plans research].freeze
 FRONTMATTER_PATTERN = /\A---\n(.+?)\n---\n?/m
+LIST_PATTERN = /\A(\s*)([-*+]|\d+[.)])\s+/
 
 # ANSI helpers: color only on a tty.
 def colorize(text, code)
@@ -46,7 +49,7 @@ end
 STATUS_CODES = { 'active' => 92, 'parked' => 93, 'done' => 2, 'invalid' => 91 }.freeze
 
 def root_files
-  Dir.glob("#{NOTES_DIR}/*.md").reject { |path| File.basename(path) == HANDOFF }.sort
+  Dir.glob("#{NOTES_DIR}/*.md").reject { |path| File.basename(path).match?(HANDOFF_PATTERN) }.sort
 end
 
 def category_files
@@ -99,7 +102,8 @@ class Note
     fields['title'] ||= derived_title
     fields['status'] ||= 'active'
     fields['summary'] = derived_summary if fields['summary'].to_s.strip.empty?
-    "#{frontmatter_block(fields)}#{body.start_with?("\n") ? body : "\n#{body}"}"
+    text = reflow(body)
+    "#{frontmatter_block(fields)}#{text.start_with?("\n") ? text : "\n#{text}"}"
   end
 
   private
@@ -107,6 +111,7 @@ class Note
   def parse
     match = @content.match(FRONTMATTER_PATTERN)
     @has_block = !match.nil?
+    @errors.concat(hard_wrap_errors)
     return @errors << 'missing frontmatter' if match.nil?
 
     parsed = begin
@@ -164,6 +169,99 @@ class Note
     return unless File.exist?(@path)
 
     File.mtime(@path).strftime('%Y-%m-%d')
+  end
+
+  # Hard-wrapped prose violates the one-paragraph-per-line convention: a
+  # non-structural line that continues the previous prose, bullet, or
+  # blockquote line. Fences, headings, tables, blank lines, list markers,
+  # and intentional hard breaks (trailing two spaces) never join.
+  def hard_wrap_errors
+    numbers = hard_wrap_line_numbers
+    return [] if numbers.empty?
+
+    ["hard-wrapped prose at line#{'s' if numbers.size > 1} #{numbers.join(', ')}"]
+  end
+
+  def hard_wrap_line_numbers
+    offset = @has_block ? @content.match(FRONTMATTER_PATTERN)[0].lines.length : 0
+    in_fence = false
+    prev = :other
+    last = ''
+    body.lines(chomp: true).filter_map.with_index(offset) do |line, index|
+      if line.start_with?('```')
+        in_fence = !in_fence
+        prev = :other
+        last = line
+        next nil
+      end
+      next nil if in_fence
+
+      stripped = line.strip
+      number = nil
+      if stripped.empty?
+        prev = :blank
+      elsif line.lstrip.start_with?('#', '|', '<!--') || stripped == '---'
+        prev = :other
+      elsif line.lstrip.start_with?('>')
+        content = line.lstrip.sub(/\A>\s?/, '').strip
+        number = index + 1 if prev == :quote && !content.empty? && !last.end_with?('  ', '\\')
+        prev = content.empty? ? :other : :quote
+      elsif line.match?(LIST_PATTERN)
+        prev = :prose
+      else
+        number = index + 1 if prev == :prose && !last.end_with?('  ', '\\')
+        prev = :prose
+      end
+      last = line
+      number
+    end
+  end
+
+  # Join hard-wrapped prose into one line per paragraph, bullet, or
+  # blockquote paragraph. Structural lines pass through untouched.
+  def reflow(text)
+    out = []
+    in_fence = false
+    prev = :other
+    text.lines(chomp: true).each do |line|
+      if line.start_with?('```')
+        in_fence = !in_fence
+        out << line
+        prev = :other
+        next
+      end
+      next out << line if in_fence
+
+      stripped = line.strip
+      if stripped.empty?
+        out << line.rstrip
+        prev = :blank
+      elsif line.lstrip.start_with?('#', '|', '<!--') || stripped == '---'
+        out << line.rstrip
+        prev = :other
+      elsif line.lstrip.start_with?('>')
+        raw = line.lstrip.sub(/\A>\s?/, '')
+        content = raw.strip
+        if content.empty?
+          out << line.rstrip
+          prev = :other
+        elsif prev == :quote && !out.last.end_with?('  ', '\\')
+          out[-1] = "> #{out.last.sub(/\A>\s?/, '').rstrip} #{content}"
+        else
+          out << (raw.end_with?('  ') ? "> #{content}  " : "> #{content}")
+          prev = :quote
+        end
+      elsif (match = LIST_PATTERN.match(line))
+        out << "#{match[1]}#{match[2]} #{line[match.end(0)..].strip}"
+        prev = :prose
+      elsif prev == :prose && !out.last.end_with?('  ', '\\')
+        out[-1] = "#{out.last.rstrip} #{stripped}"
+      else
+        out << (line.end_with?('  ') ? "#{stripped}  " : stripped)
+        prev = :prose
+      end
+    end
+    "#{out.join("\n")}#{text.end_with?("\n") ? "\n" : ''}"
   end
 end
 
