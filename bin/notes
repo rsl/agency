@@ -5,6 +5,9 @@
 # The PATH entry point is `agency` (bin/agency): `agency notes <cmd>`.
 # Run from the project root whose .agent-notes/ you mean.
 #
+#   notes init            set up .agent-notes/ in the current repo: gitignore
+#                         the ephemeral layer, scaffold README.md if missing;
+#                         refuses when ignored-path files are already tracked
 #   notes report          grouped TOC by status (durable layer: root +
 #                         plans/ + research/)
 #   notes stale [days]    durable notes untouched for N days (default 90);
@@ -25,6 +28,7 @@
 # including macOS system Ruby 2.6, will not parse this.
 
 require 'date'
+require 'fileutils'
 require 'open3'
 require 'yaml'
 
@@ -265,13 +269,95 @@ def format
   puts 'nothing to format'
 end
 
+GITIGNORE_MARKER = '# agent-notes: ephemeral layer (sessions, handoffs, personal, local)'.freeze
+GITIGNORE_ENTRIES = [
+  "#{NOTES_DIR}/local/",
+  "#{NOTES_DIR}/sessions/",
+  "#{NOTES_DIR}/handoff-*.md",
+  "#{NOTES_DIR}/personal/",
+].freeze
+
+README_TEMPLATE = <<~MD
+  ---
+  title: Agent notes
+  status: active
+  summary: Conventions and declared parameters for this repo's .agent-notes/.
+  ---
+
+  # Agent notes
+
+  Session state and durable agent notes for this repo, per the agency `.agent-notes/` convention.
+
+  Two parameters this project declares (edit to fit):
+
+  - Registry: .agent-notes/open-items.md
+  - Notes-tracking policy: root docs tracked; sessions/, handoff-*.md, personal/, and local/ gitignored (see .gitignore)
+MD
+
+# One-time setup for a repo's .agent-notes/: gitignore the ephemeral
+# layer, scaffold a README when none exists. Tracked files under
+# would-be-ignored paths are a conflict — reported, never auto-untracked.
+def init
+  conflicts = tracked_ephemeral_files
+  unless conflicts.empty?
+    puts 'Tracked files under paths that should be ignored — untrack them first:'
+    conflicts.each { |path| puts "  #{path}" }
+    puts '  (git rm --cached <path>, then commit; then re-run notes init)'
+    exit 1
+  end
+
+  FileUtils.mkdir_p(NOTES_DIR)
+  wrote_gitignore = ensure_gitignore_entries
+  wrote_readme = ensure_readme
+
+  puts 'agent-notes init:' unless wrote_gitignore || wrote_readme
+  puts "  .gitignore entries added" if wrote_gitignore
+  puts "  #{NOTES_DIR}/README.md scaffolded" if wrote_readme
+  puts '  already set up' unless wrote_gitignore || wrote_readme
+end
+
+def tracked_ephemeral_files
+  patterns = GITIGNORE_ENTRIES.map { |entry| entry.delete_suffix('/') }
+  output, _err, _status = Open3.capture3('git', 'ls-files', NOTES_DIR)
+  output.lines.map(&:strip).select do |path|
+    next false if path.empty?
+
+    basename = File.basename(path)
+    patterns.any? do |pattern|
+      path.start_with?("#{pattern}/") || (pattern.include?('*') && File.fnmatch(pattern, path))
+    end || (File.dirname(path) == NOTES_DIR && basename.start_with?('handoff-'))
+  end
+end
+
+def ensure_gitignore_entries
+  gitignore = File.exist?('.gitignore') ? File.read('.gitignore') : ''
+  missing = GITIGNORE_ENTRIES.reject { |entry| gitignore.lines.include?("#{entry}\n") }
+  return false if missing.empty?
+
+  File.open('.gitignore', 'a') do |file|
+    file.puts unless gitignore.end_with?("\n") || gitignore.empty?
+    file.puts GITIGNORE_MARKER
+    missing.each { |entry| file.puts entry }
+  end
+  true
+end
+
+def ensure_readme
+  readme = "#{NOTES_DIR}/README.md"
+  return false if File.exist?(readme)
+
+  File.write(readme, README_TEMPLATE)
+  true
+end
+
 case ARGV[0]
+when 'init' then init
 when 'report' then report
 when 'stale' then stale(ARGV[1]&.to_i || 90)
 when 'lint' then lint
 when 'format' then format
 when 'expire' then expire(ARGV[1] == '--' ? 30 : (ARGV[1]&.to_i || 30), ARGV[1] == '--' ? ARGV[2..] : nil)
 else
-  puts 'usage: notes <report|stale|lint|format|expire> [-- files...]'
+  puts 'usage: notes <init|report|stale|lint|format|expire> [-- files...]'
   exit 2
 end

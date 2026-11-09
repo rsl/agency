@@ -15,7 +15,7 @@ OPENCODE_DIR="${HOME}/.config/opencode"
 
 usage() {
   print "usage: agency <install|status> <harness>"
-  print "       agency notes <report|stale|lint|format|expire> [args]"
+  print "       agency notes <init|report|stale|lint|format|expire> [args]"
   print ""
   print "  install  create missing mappings for a harness (idempotent; never clobbers real files)"
   print "  status   report each mapping for a harness: linked, drifted, conflict, or missing"
