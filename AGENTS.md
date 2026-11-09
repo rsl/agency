@@ -1,8 +1,6 @@
 # Shared agent guidance
 
-Portable instructions that apply across projects and tools. Keep this free of
-personal details and machine-specific paths — this file ships in the public
-`agency` repo.
+Portable instructions that apply across projects and tools. Keep this free of personal details and machine-specific paths — this file ships in the public `agency` repo.
 
 Personal rules live in a separate machine-local file (never committed) and load before this one.
 
@@ -15,17 +13,9 @@ Personal rules live in a separate machine-local file (never committed) and load 
 
 ## Commits
 
-- Never commit without asking. A commit happens only on the developer's
-  explicit word addressed at committing; approval to build, verify, or
-  finish never licenses one. When in doubt, bring the work and stop
-  short of the commit.
-- Granular commits — one logical unit each. A follow-up belonging to
-  the last commit amends it (`git commit --amend`, unpushed only);
-  anything else is a new commit. Never amend a pushed commit. No fixup
-  commits, no autosquash, no rebase.
-- Batch small changes and bring them as one ask. The uncommitted state
-  gets named when the work is delivered, once — no reminders after
-  that.
+- Never commit without asking. A commit happens only on the developer's explicit word addressed at committing; approval to build, verify, or finish never licenses one. When in doubt, bring the work and stop short of the commit.
+- Granular commits — one logical unit each. A follow-up belonging to the last commit amends it (`git commit --amend`, unpushed only); anything else is a new commit. Never amend a pushed commit. No fixup commits, no autosquash, no rebase.
+- Batch small changes and bring them as one ask. The uncommitted state gets named when the work is delivered, once — no reminders after that.
 
 ## Communication
 
@@ -33,7 +23,7 @@ Personal rules live in a separate machine-local file (never committed) and load 
 - On failure: one brief acknowledgment.
 - No emojis anywhere.
 - Prose first; no section headers unless the answer needs them.
-- Markdown: one paragraph, bullet, or sentence per line — let editors soft-wrap.
+- Markdown: one paragraph, bullet, or sentence per line — never hard-wrap lines at a column width; editors word-wrap, and every hard newline in prose is a defect. This applies to all markdown you write, including notes, handoffs, and READMEs.
 - Skill frontmatter: `description` unquoted when possible, single quotes otherwise.
 - Match the register to the reader — casual with the user; for anyone else, whatever fits them.
 - Pointers to state: a full URL (or path) plus a name, never a bare id — machinery gets its file path. Applies in conversation, handoffs, and docs alike.
@@ -63,13 +53,8 @@ Personal rules live in a separate machine-local file (never committed) and load 
 
 ## Notes and handoffs (every project)
 
-Session handoffs follow the handoff skills, in whatever project the
-session works in: reading/opening per `handoff-read`, writing/close-out
-per `handoff`. State lives in that project's
-`.agent-notes/handoff-<branch>.md` — one gitignored file per in-flight
-branch, written and overwritten at that branch's close-outs. Each
-project declares its own two parameters (registry path,
-notes-tracking policy) in its AGENTS.md or `.agent-notes/README.md`.
+Session handoffs follow the handoff skills, in whatever project the session works in: reading/opening per `handoff-read`, writing/close-out per `handoff`. State lives in that project's `.agent-notes/handoff-<branch>.md` — one gitignored file per in-flight branch, written and overwritten at that branch's close-outs. Each project declares its own two parameters (registry path, notes-tracking policy) in its AGENTS.md or `.agent-notes/README.md`.
 
-Agency itself: registry `.agent-notes/open-items.md`; root `.agent-notes/`
-docs are tracked; `handoff-*.md`, `sessions/`, and `personal/` are gitignored.
+The portable default every repo should follow: root `.agent-notes/` docs tracked; `local/`, `sessions/`, `handoff-*.md`, and `personal/` gitignored. `agency notes init` (in the agency repo) sets that up in a target repo — gitignores the ephemeral layer, scaffolds a README, and refuses if anything under those paths is already tracked. Deviations are per-project choices, made in the project's own README, not silent drift.
+
+Agency itself: registry `.agent-notes/open-items.md`; root `.agent-notes/` docs are tracked; `handoff-*.md`, `sessions/`, and `personal/` are gitignored.
