@@ -8,6 +8,8 @@ History-mutating operations (amend, reset, rebase, cherry-pick, force-push) are 
 
 An approval covers one attempt. When any git operation fails, the sequence stops — show the raw failure and wait for direction; a retry is a new proposal.
 
+Before any commit, run whatever quality checks the project defines (formatters, linters, typechecks, spec runs) on the staged changes — any of them, in the project's own order. A failure stops the commit: report it and wait; the red skill governs failures.
+
 Agents never push. `git push` (and any remote-mutating git operation) is the developer's hands only, unconditionally — deliver the branch name and stop. The developer pushes and opens PRs.
 
 When the developer says "make a PR" (or "open a PR", "prep a PR"), assume the branch is already pushed — do not push or ask about pushing. Do not refuse because a remote branch can't be found; if the remote branch is missing or stale, note it in one line and proceed with the PR flow anyway (`gh pr create` will surface the real state).
