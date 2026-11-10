@@ -5,7 +5,7 @@ description: Use when the user says "read handoff", "read the handoff", "pick up
 
 # Handoff — reading (opening act)
 
-Ephemeral session state lives in the working project's `.agent-notes/` — the public tree never contains it. One live handoff per in-flight branch, keyed by branch name; the opening act knows the key from git. Do not collapse back to a single file without new information, and do not read the per-branch design as an argument for creating branches — a branch is never created just to have a handoff slot.
+Ephemeral session state lives in the working project's `.agent-notes/` — the public tree never contains it. One live handoff per in-flight branch, keyed by branch name. Do not collapse back to a single file without new information.
 
 ## The layout
 
