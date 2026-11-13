@@ -8,8 +8,10 @@ History-mutating operations (amend, reset, rebase, cherry-pick, force-push) are 
 
 An approval covers one attempt. When any git operation fails, the sequence stops — show the raw failure and wait for direction; a retry is a new proposal.
 
+Before any commit, run whatever quality checks the project defines (formatters, linters, typechecks, spec runs) on the staged changes — any of them, in the project's own order. A failure stops the commit: report it and wait; the red skill governs failures.
+
 Agents never push. `git push` (and any remote-mutating git operation) is the developer's hands only, unconditionally — deliver the branch name and stop. The developer pushes and opens PRs.
 
-Branch on request only: `git co -b <name>` from an up-to-date `main`, no other arguments, ever — no start-point argument. A remote-tracking start point (`git co -b <name> origin/main`) silently sets the new branch's upstream to that remote branch, and plain `git push` follows the upstream, not the branch name — it would target `main` without ever saying so.
+When the developer says "make a PR" (or "open a PR", "prep a PR"), assume the branch is already pushed — do not push or ask about pushing. Do not refuse because a remote branch can't be found; if the remote branch is missing or stale, note it in one line and proceed with the PR flow anyway (`gh pr create` will surface the real state).
 
-The default is the current branch — `main` included. Branching happens only on the developer's explicit word addressed at branching. If a branch seems needed, that is its own stop-and-ask before any work begins.
+The default is the current branch — `main` included. An agent never puts new work on a branch it did not ask for: no `git co -b`, no `git switch -c`, no worktree, no rename-and-move, no tool that lands commits somewhere other than the branch the session started on — the rule covers the outcome, not the command spelling. Every branch creation requires the developer's explicit word addressed at branching, asked and approved first, every single time. If a branch seems needed, that is its own stop-and-ask before any work begins.
