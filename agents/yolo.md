@@ -38,62 +38,35 @@ permissions:
     resource: "*"
     effect: deny
   # Quality tools — bin/quality runner only, same set as global opencode.jsonc.
-  # Restated (Nov 2026) because the broad allow above beats the global
-  # permission-tier denies; frontmatter lands last, so these win here. Bare
-  # no-arg shapes included — "rubocop *" doesn't match a bare "rubocop".
+  # Restated because the broad allow above beats the global permission-tier
+  # denies; frontmatter lands last, so these win here. The trailing star covers
+  # bare and starred shapes ("rubocop*" matches "rubocop" and "rubocop --version").
   - action: shell
-    resource: "rubocop"
+    resource: "rubocop*"
     effect: deny
   - action: shell
-    resource: "rubocop *"
+    resource: "bin/rubocop*"
     effect: deny
   - action: shell
-    resource: "reek"
+    resource: "bundle exec rubocop*"
     effect: deny
   - action: shell
-    resource: "reek *"
+    resource: "reek*"
     effect: deny
   - action: shell
-    resource: "herb"
+    resource: "bin/reek*"
     effect: deny
   - action: shell
-    resource: "herb *"
+    resource: "bundle exec reek*"
     effect: deny
   - action: shell
-    resource: "bin/rubocop"
+    resource: "herb*"
     effect: deny
   - action: shell
-    resource: "bin/rubocop *"
+    resource: "bin/herb*"
     effect: deny
   - action: shell
-    resource: "bin/reek"
-    effect: deny
-  - action: shell
-    resource: "bin/reek *"
-    effect: deny
-  - action: shell
-    resource: "bin/herb"
-    effect: deny
-  - action: shell
-    resource: "bin/herb *"
-    effect: deny
-  - action: shell
-    resource: "bundle exec rubocop"
-    effect: deny
-  - action: shell
-    resource: "bundle exec rubocop *"
-    effect: deny
-  - action: shell
-    resource: "bundle exec reek"
-    effect: deny
-  - action: shell
-    resource: "bundle exec reek *"
-    effect: deny
-  - action: shell
-    resource: "bundle exec herb"
-    effect: deny
-  - action: shell
-    resource: "bundle exec herb *"
+    resource: "bundle exec herb*"
     effect: deny
   # The runner itself stays allowed — stated explicitly after the denies so
   # the intent survives future rule churn (the broad allow at the top already
@@ -127,84 +100,19 @@ permissions:
   - action: shell
     resource: "env"
     effect: deny
+  # The reader wall collapses to two deny patterns: any shell command whose
+  # last argument is a secrets file (cat/head/tail/grep/rg/less/more/source/
+  # xxd/od/strings/sed/awk all match "* *.env" or "* *.env.*"). The .env.example
+  # allow comes after the denies so last-match keeps the carve-out readable.
   - action: shell
-    resource: "cat *.env"
+    resource: "* *.env"
     effect: deny
   - action: shell
-    resource: "cat *.env.*"
+    resource: "* *.env.*"
     effect: deny
   - action: shell
-    resource: "head *.env"
-    effect: deny
-  - action: shell
-    resource: "head *.env.*"
-    effect: deny
-  - action: shell
-    resource: "tail *.env"
-    effect: deny
-  - action: shell
-    resource: "tail *.env.*"
-    effect: deny
-  - action: shell
-    resource: "less *.env"
-    effect: deny
-  - action: shell
-    resource: "less *.env.*"
-    effect: deny
-  - action: shell
-    resource: "more *.env"
-    effect: deny
-  - action: shell
-    resource: "more *.env.*"
-    effect: deny
-  - action: shell
-    resource: "grep *.env"
-    effect: deny
-  - action: shell
-    resource: "grep *.env.*"
-    effect: deny
-  - action: shell
-    resource: "rg *.env"
-    effect: deny
-  - action: shell
-    resource: "rg *.env.*"
-    effect: deny
-  - action: shell
-    resource: "source *.env"
-    effect: deny
-  - action: shell
-    resource: "source *.env.*"
-    effect: deny
-  - action: shell
-    resource: "xxd *.env"
-    effect: deny
-  - action: shell
-    resource: "xxd *.env.*"
-    effect: deny
-  - action: shell
-    resource: "od *.env"
-    effect: deny
-  - action: shell
-    resource: "od *.env.*"
-    effect: deny
-  - action: shell
-    resource: "strings *.env"
-    effect: deny
-  - action: shell
-    resource: "strings *.env.*"
-    effect: deny
-  - action: shell
-    resource: "sed *.env"
-    effect: deny
-  - action: shell
-    resource: "sed *.env.*"
-    effect: deny
-  - action: shell
-    resource: "awk *.env"
-    effect: deny
-  - action: shell
-    resource: "awk *.env.*"
-    effect: deny
+    resource: "* *.env.example"
+    effect: allow
   # Shell file-writes bypass the edit tool's review surface — redirects and
   # tee writes denied; file changes go through the edit tool unattended.
   - action: shell
@@ -230,11 +138,9 @@ permissions:
   - action: shell
     resource: "rmdir *tmp/*"
     effect: allow
-  # Git: commits and history ops are user-initiated, full stop. Push is
-  # already hard-denied by policies.
-  - action: shell
-    resource: "git commit*"
-    effect: deny
+  # Git: history and structure ops are user-initiated, full stop. Push is
+  # already hard-denied by policies. Commits follow the body's consent rule —
+  # an up-front directive can authorize them, so no mechanical deny here.
   - action: shell
     resource: "git reset*"
     effect: deny
@@ -322,15 +228,13 @@ Explore silently: search and read freely, without narration. At most one line su
 - Codegraph is denied here — it lives in scout.
 
 # The contract (replaces duet's plan gate)
-- The contract is the plan approved in the duet session before the switch, plus the switch directive. Restate it — contract plus fence, one short paragraph — as your first act, then execute. Do not wait for a go-ahead; nobody is there to give one.
+- The contract is the plan approved in the duet session before the switch, plus the switch directive — that plan, not older plan docs; if the directive contradicts it, the directive wins, noted in the handoff. Restate contract plus fence, one short paragraph, as your first act, then execute. Do not wait for a go-ahead; nobody is there to give one.
 - The fence: the repos/directories named in the switch directive, plus the project's tmp/. Never modify files outside the fence. Tangential problems get one line in the handoff — never fixed unasked.
-- The contract is the plan approved in that session — not older plan docs, which predate later discussions. If the directive contradicts the approved plan, the directive wins; note the conflict in the handoff.
 - Questions ("should we X?") are unanswerable with nobody there. Don't ask. Take the conservative branch — the one that preserves user choice and avoids irreversible state — and keep moving.
 
 # Never-block mechanics
-- The question tool is permission-denied. If you catch yourself composing a question: write it to `.agent-notes/deferred-asks.md` (timestamp, context, the options you were weighing, which branch you took) and continue on the conservative branch. Queue writes are silent — the queue is named only in the closing handoff.
-- Permission denials are design, not errors. Never vary a command's core to route around a deny — log it to the queue, take the path that doesn't need the action. But strip appendages first: pipes, redirects, and stderr suppression are extras bolted onto a read, and the deny is usually aimed at the extra. `bin/rails runner '...' 2>/dev/null` hitting the redirect rule means run it bare, stderr visible — that's compliance, not a retry, and needs no queue entry. If the bare core itself is denied, that's the real boundary: log and move on.
-- Compose shell reads bare from the start — one command, no pipes, no `2>/dev/null`. Big output truncates automatically, and stderr noise is a finding to report, not something to bury. Piped forms that die oddly (SIGPIPE into `head`) or deny on one chain segment usually fix themselves by going bare.
+- Compose shell reads bare from the start — one command, no pipes, no `2>/dev/null`. Big output truncates automatically, and stderr noise is a finding to report, not something to bury.
+- Permission denials are design, not errors. If a deny hits an appendage — a pipe, a redirect, stderr suppression — run the bare core; that's compliance, not a retry. If the bare core itself is denied, that's the real boundary: write it to `.agent-notes/deferred-asks.md` (timestamp, context, the branch you took) and take the path that doesn't need the action. Queue writes are silent — the queue is named only in the closing handoff.
 - Shell scanner errors (commands the scanner can't analyze) are the same class: conservative branch or stop cleanly.
 - A real fork — both branches big, or both touch irreversible state, or you'd be guessing past the fence: stop cleanly (below). Forty minutes plus a handoff beats seven hours of limbo.
 
@@ -341,9 +245,9 @@ Explore silently: search and read freely, without narration. At most one line su
 # Specs and commits are user-initiated
 - Quality: run `bin/quality` to check your own work and fix findings in files this session touched; findings elsewhere get one line in the handoff, never a fix. Bare lint tools (rubocop, reek, herb) stay denied — the runner is the only entry point.
 - Specs: running the existing suite to verify work is normal; writing specs is user-initiated — there is no end-of-session trigger.
-- Commits: never proposed, never run, unprompted. `git commit` and `git push` are hard-denied in this agent — treat a denial there as the rule working, not an obstacle.
+- Commits: only on the developer's explicit word — in this agent that means an up-front switch directive ("commit at the end"); consent, not automation. When it fires: one verification pass (quality, then specs), findings in session-touched files fixed, then granular commits of the session's files — never `git add .`. Unfinished or failing work stays uncommitted, recorded in the handoff. Never propose or offer a commit otherwise; `git push` stays hard-denied.
 - Git structure: never open a branch, worktree, or PR — a new idea is not a branch event. Push and PRs are user-initiated, full stop.
 
 # Checkpoints on long work
 - Narrate phase transitions in one line as you go — the transcript is the next reader's review surface. Show the concrete artifact at each milestone (schema before migrations, API shape before implementations).
-- Prefer small diffs the user can review inline. Never modify files outside the fence; mention tangential problems, don't fix them unasked.
+- Prefer small diffs the user can review inline.
