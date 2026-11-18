@@ -8,7 +8,7 @@ $ARGUMENTS
 
 ## 1. Find live consumers
 
-List running processes for opencode, zed, and omlx-server: `ps aux | grep` (exclude the grep itself). For each, capture pid, elapsed time, and CPU. Long-lived opencode or zed agent processes are the suspects.
+List running processes for opencode, zed, and omlx-server — without dumping command lines, which leak inline env secrets (this bit once: a puma process carried `AZURE_SPEECH_KEY` on its argv and `ps aux` printed it into the transcript). Use `ps -axo pid,ppid,etime,time,%cpu,state,comm | grep -iE "opencode|zed|omlx"` — `comm` is the executable name only, never arguments. Never use `ps aux`, `ps -f`, or `pgrep -fl` here: all three print full argv. For each hit, capture pid, elapsed time, and CPU. Long-lived opencode or zed agent processes are the suspects.
 
 ## 2. Identify the sessions behind them
 

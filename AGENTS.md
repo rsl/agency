@@ -13,9 +13,8 @@ Personal rules live in a separate machine-local file (never committed) and load 
 
 ## Commits
 
-- Never commit without asking. A commit happens only on the developer's explicit word addressed at committing; approval to build, verify, or finish never licenses one. When in doubt, bring the work and stop short of the commit.
-- Granular commits — one logical unit each. A follow-up belonging to the last commit amends it (`git commit --amend`, unpushed only); anything else is a new commit. Never amend a pushed commit. No fixup commits, no autosquash, no rebase.
-- Batch small changes and bring them as one ask. The uncommitted state gets named when the work is delivered, once — no reminders after that.
+- Never commit without the developer's explicit word addressed at committing — the consent rules, staging limits, and amend rules load with the git skill when commits are at stake. In yolo/unattended sessions the same bar applies; an up-front instruction ("commit at the end") is consent, not an automation.
+- Name the uncommitted state when work is delivered, once — no reminders after that.
 
 ## Communication
 
@@ -46,8 +45,11 @@ Personal rules live in a separate machine-local file (never committed) and load 
 - Real credentials in tool output: name it in-session — what leaked, where — and never write the incident into notes, handoffs, or registries.
 - The developer's name never lands in tracked files — notes, docs, code comments. "Developer" (or "dev") means the human developer; end users are "users" or "end users". Attribution reads "the developer" or "developer decision". Machine-local config says to *address* the developer by name; that never means *record* it.
 - Scratch files go in the project's `tmp/`, never a system temp dir.
-- File changes go through `edit`/`write` only — shell one-liners mangle formatting. Target exact anchors over rewrites; after two failed edits, re-read and widen.
+- File changes go through `edit`/`write` only — shell one-liners mangle formatting. Target exact anchors over rewrites; after one failed edit, re-read and widen.
+- Big single writes are where truncation, drift, and mangled formatting show up — and re-reading to fix them burns more context. Don't create the problem: keep every `write` small from the start, split across files when that's the honest shape.
 - Shell read commands: one command per call, batched as parallel tool calls. Drop command substitutions `$(...)` and fd redirects like `2>/dev/null` from read commands, and let stderr show rather than suppressing it.
+- Reports go to files, not pipes: when a project ships bin scripts that write findings to `tmp/` report files (quality, specs, lookups), run the script and read the report with the read/grep tools. Never pipe script output through `tail`/`head`/`grep`, never redirect (`2>&1` forces a permission ask), and prefer the project's own runner over hand-rolled shell chains.
+- When the same ad-hoc lookup is asked for a second time, propose promoting it into a `bin/` script (report-to-tmp shape) and open the discussion — don't build it unprompted.
 - Some shells (notably zsh, the default on macOS) abort the whole line on a failed glob ("no matches found") — later commands never run, so "not found" may mean the search never ran. List files explicitly or guard globs.
 - Search tools with hidden-default-false silently skip dot-paths: a pattern crossing `.agent-notes/` (or any dot-directory) returns empty as if the path didn't exist. Point the search root at the dot-directory, or set `hidden: true`. An absence claim needs a positive probe — a silent-empty result is a tool artifact, not evidence.
 

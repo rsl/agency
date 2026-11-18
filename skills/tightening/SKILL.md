@@ -44,15 +44,14 @@ Agent files only grow; each war story adds a rule and rules accrete narration. F
 ## Publication boundary
 
 - No client, project, repo, or user names; no relationship sketches or infrastructure specifics that triangulate private work — genericize to "another repo" or cut the clause, including in historical records.
+- `skills/personal/` is the personal layer and exempt — names and personal context belong there by design.
 - Uncommitted history ships at first push; scrub before it compiles.
 
 ## Process
 
 - Read the reference material and the actual config/files before proposing cuts — most bad proposals die on a fact one read would surface.
-- The pass edits a copy, never the live file. Flow, in order: copy the target surface into `.agent-notes/drafts/` → edit the copy → review the edits in the copy. The live file is untouched until promotion. Draft names mirror the source path with `/` replaced by `-` — `skills/handoff/SKILL.md` drafts as `drafts/skills-handoff.md` — one naming rule, every pass, so drafts land predictably instead of differently each time.
-- The review is the itemized draft-vs-live diff — each cut or move one numbered line, with the reason it dies. Vetoes during the walk correct the draft; live is never edited directly during a pass.
-- Promotion runs in one of two modes, the owner's choice: **item by item** — each item settles in its own propose-wait-apply exchange in the draft, the default for contested or unfamiliar surfaces — or **promote whole, then review** — the owner approves the itemized draft wholesale, the cuts stand in the draft, and the pass walks the items one exchange each, vetoes landing as corrections to the draft. The walk exists because wholesale approval must not skip the per-item judgment. In both modes live is written once, at the pass's final step: the draft promotes onto live, and draft and live converge only there — they do not match during the walk.
-- Every walk exchange shows the item verbatim — the original text and the final text as quoted before/after blocks (as prose, not `+`/`-` diff syntax), never a prose summary. Prose summaries hide residual bloat; side-by-side verbatim exposes it. The verdict goes through the question tool (stand or veto), keeping the walk's judgment calls in the decision channel rather than chat drift.
+- The pass edits a copy, never the live file. Flow, in order: copy the target surface into `.agent-notes/drafts/` → edit the copy → review the edits in the copy. Draft names mirror the source path with `/` replaced by `-` — `skills/handoff/SKILL.md` drafts as `drafts/skills-handoff.md` — one naming rule, every pass, so drafts land predictably instead of differently each time.
+- All refinement happens on the draft. The review is the itemized draft-vs-live diff — each cut or move one numbered line, with the reason it dies — and the walk settles every item on the draft, each shown verbatim (original and final text as quoted before/after blocks, never a prose summary) with its verdict through the question tool. Vetoes correct the draft. The live file is written exactly once, only after the walk ends with every item settled — never mid-pass, never per item.
 - When the pass ends, prune the draft; git history carries the record.
 - Count rules before and after; rules survive 1:1. A rule that dies was a restatement — say so and let the owner veto.
 - When a pass ports details into skills, audit the receiving skill for redundancy with the source — cross-file restatement is the same sin as in-file restatement.

@@ -1,16 +1,22 @@
 ---
 description: Codebase scout — answers research questions (how X works, where Y lives, what Z says) using codegraph first; returns conclusions with file:line refs, never file dumps.
 mode: subagent
-# Web un-gating (Nov 2026), same as research.md: scout is read-only, so it
-# fetches docs unprompted; frontmatter rules land last and beat the global
-# webfetch ask, which stays as duet/build's exfil checkpoint.
 permissions:
+  # Web un-gating, same as research.md: scout is read-only, so it fetches
+  # docs unprompted; frontmatter rules land last and beat the global webfetch
+  # ask, which stays as duet/build's exfil checkpoint.
   - action: webfetch
     resource: "*"
     effect: allow
+  # Structural read-only (Nov 2026): the body's "you never edit files" was
+  # prompt-only until this deny. No carve-out — scout writes nothing durable;
+  # findings return as text to the caller, which decides where they land.
+  - action: edit
+    resource: "*"
+    effect: deny
 ---
 
-You are a scout: you answer questions about the codebase so the duet's root context stays lean. Surveys, multi-file questions, multi-hop flows, and "what does X do" all belong here. You never edit files.
+You are a scout: you answer questions about the codebase so the duet's root context stays lean. Surveys, multi-file questions, multi-hop flows, and "what does X do" all belong here. You never edit files — the frontmatter deny makes that structural, not a plea.
 
 # Tools
 
