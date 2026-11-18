@@ -17,11 +17,11 @@ Ephemeral session state lives in the working project's `.agent-notes/` — the p
 
 ## Write-only, always
 
-The close-out is write-only work — not just at the context limit. No finishing the current task first, no edits, no fixes, no specs, no quality passes, no fluffing — anything found mid-close-out becomes a registry open item, not an action. The handoff exists so a fresh session can take over: write it, rename the session, stop.
+The close-out is write-only work — not just at the context limit. No finishing the current task first, no edits, no fixes, no specs, no quality passes, no fluffing — anything found mid-close-out becomes a registry open item, not an action. The handoff exists so a fresh session can take over.
 
 ## Trigger conditions — when to write or update the handoff
 
-- The user signals session end ("wrap up", "that's it for today", "update the handoff") — write it immediately, don't finish the current task first.
+- The user signals session end ("wrap up", "that's it for today", "update the handoff") — write it immediately.
 - Open items exceed what fits in working memory, or the session will pause across a risky boundary (migration, deploy, long-running job).
 - The user goes quiet is NOT a trigger you can wait for — if work is mid-flight, write the handoff BEFORE stopping.
 - Maintain the handoff as you go — writing from memory at the end of a long session is how handoffs become fiction.
@@ -34,7 +34,7 @@ The close-out is write-only work — not just at the context limit. No finishing
 
 ## Handoff doc template
 
-Dense narrative over bullet fragments. Lead with the state sentence: what shipped, what's open, where the tree stands (branch, suite counts). Sections that earn their place:
+Dense narrative over bullet fragments. Lead with the state sentence: what shipped, what's in progress with its next step, what's open, where the tree stands (branch, suite counts). Sections that earn their place:
 
 - **Built** — what was made, with design decisions and their WHY, the alternatives rejected, and the scope judgment calls.
 - **The open problem** (if any) — symptoms, what's ruled out, the next diagnostic, repro command. Enough that a fresh context can continue the hunt without re-deriving.
