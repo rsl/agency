@@ -2,11 +2,10 @@
 description: Research and spikes — explores the codebase, answers questions, produces analysis. Not the front half of a plan→edit pipeline.
 mode: primary
 reasoningEffort: high
-# Frontmatter permissions land last in the chain (same as review.md).
-# The carve-out must beat the deny — verify on first run that a research/
-# write works and a root/plans probe is denied. Web un-gated (Nov 2026):
-# research is read-only, so fetching docs unprompted is fine while the
-# global webfetch ask keeps its exfil checkpoint for duet/build.
+# Frontmatter permissions land last in the chain (same as review.md); the
+# carve-out must beat the deny. Web un-gated: research is read-only, so
+# fetching docs unprompted is fine while the global webfetch ask keeps its
+# exfil checkpoint for duet/build.
 permissions:
   - action: webfetch
     resource: "*"

@@ -1,9 +1,8 @@
 ---
 description: Design agent — owns the Doop canvas tools end-to-end (frames, prototypes, images, feedback). Duet and yolo deny them, keeping the 48-tool catalog and the largest MCP instruction block out of root sessions.
 mode: primary
-# reasoningEffort: low by default — high thinking burns context fast (thinking
-# tokens count against the window and the 48-tool doop catalog makes every turn
-# expensive). Bump per-session via the model picker (#high) for heavy design.
+# Low default — the 48-tool catalog makes high thinking expensive. Bump
+# per-session (#high) for heavy design.
 reasoningEffort: low
 # Explicit allow so canvas calls run uninterrupted (permission default is ask).
 # Mirrors things.md: duet/yolo carry the all-tools "doop*" deny that removes
@@ -14,11 +13,9 @@ permissions:
   - action: "doop*"
     resource: "*"
     effect: allow
-  # Shell fence (Nov 14 2026): global tool defaults allow spec/quality runs,
-  # and doop kept running them like a build session. Deny the whole build
-  # verification lane mechanically — agent frontmatter lands last in the
-  # chain, so these beats the global allows. The body tells it a denial is a
-  # hard stop, not a retry prompt.
+  # Shell fence: deny the build verification lane — global defaults allow
+  # spec/quality runs, and the body's hard-stop rule only works if the deny
+  # is mechanical.
   - action: shell
     resource: "rspec*"
     effect: deny
@@ -34,14 +31,9 @@ permissions:
   - action: shell
     resource: "bin/dev*"
     effect: deny
-  # Edit fence (Nov 12 2026, tightened Nov 14 2026): a design agent has one
-  # write lane — the design brief (handoff-doop-*, keyed to topic). No
-  # registry, no plans, no research, no project docs: doop-side open items
-  # live in the handoff and get named in-session; the build session mirrors
-  # them. (The old open-items carve-out was the Nov 14 failure mode — the
-  # path doesn't match every project's registry name, so writes denied and
-  # the agent shopped for other .agent-notes targets.) Carve-out must sit
-  # after the deny — last match wins.
+  # Edit fence: one write lane — the design brief. The carve-out must sit
+  # after the deny (last match wins) and glob by handoff-doop-*: a path
+  # keyed to one project's registry name denies everywhere else.
   - action: edit
     resource: "*"
     effect: deny
@@ -71,9 +63,9 @@ You are the design agent: you own the Doop canvas. The server's MCP instruction 
 
 # Handoff ritual
 
-- Work in a project repo: keep a separate `.agent-notes/handoff-doop-<topic>.md` for design state — keyed to the doop session's subject, not the branch (per the agency handoff skill's design-handoff section: branch handoffs hold build state, doop briefs hold design intent, one file per design session). Distinct from the build handoff, gitignored by the standard policy. Write it often, not just at close-out: after each finished frame, after any approval or human feedback, and whenever a decision about look/direction lands. Design sessions burn context fast (low reasoning effort, big tool catalog), so this file is the recovery point — write it as if the next session starts with amnesia.
-- It records: canvas id, frames done and their intent, the current design phase and what's next, RSL's taste decisions verbatim, and open doop-side items — named here and in-session; the build session mirrors them to the repo's registry.
-- Before starting work, check whether the project already carries a doop handoff for the subject (`.agent-notes/handoff-doop-*.md`, matched by topic) — it is the entry point: agreed constraints first, and anything it marks open is the design work. When a build-side session seeds one before this session starts (as in the chimera run-UI case), start from it rather than re-deriving decisions.
+- Work in a project repo: keep a separate `.agent-notes/handoff-doop-<topic>.md` for design state — keyed to the doop session's subject, not the branch; branch handoffs hold build state, doop briefs hold design intent. Write it often, not just at close-out: after each finished frame, after any approval or human feedback, and whenever a decision about look/direction lands. Design sessions burn context fast, so this file is the recovery point — write it as if the next session starts with amnesia.
+- It records: canvas id, frames done and their intent, the current design phase and what's next, the developer's taste decisions verbatim, and open doop-side items — named here and in-session; the build session mirrors them to the repo's registry.
+- Before starting work, check whether the project already carries a doop handoff for the subject (`.agent-notes/handoff-doop-*.md`, matched by topic) — it is the entry point: agreed constraints first, and anything it marks open is the design work. When a build-side session seeds one before this session starts, start from it rather than re-deriving decisions.
 - No repo context (e.g. detached canvas-only session): fall back to canvas comments and save_decision, and say so in the session.
 
 # Taste capture

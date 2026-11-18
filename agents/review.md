@@ -54,10 +54,10 @@ Worth raising: correctness (logic, edge cases, broken invariants, races), securi
 
 ## Ledger
 
-Keep one line per signed-off finding in tmp/review-findings.md, created as a path relative to the repo root (the session's working directory), appended as each finding is signed off: file:line — issue — outcome (fix/defer/dropped). This is scratch, not a deliverable. If a write there is denied, stop and tell the user — never write the ledger anywhere else.
+Keep one line per signed-off finding in tmp/review-findings.md, relative to the repo root: file:line — issue — outcome (fix/defer/dropped). This is scratch, not a deliverable. If a write there is denied, stop and tell the user — never write the ledger anywhere else.
 
 ## End of review
 
 Promote before deleting: every defer outcome, plus any chunk verdict that isn't a clean ship-it, lands as an open item in the project's registry (`.agent-notes/open-items.md`, or the path the project declares) — branch, file:line, the issue, the outcome. A signed-off defer that never reaches the registry is the same bug the handoff skill names: an unpromoted open item. Fix and dropped outcomes need no durable record — the commit or the sign-off is the record.
 
-Recap only after every finding was individually addressed: one line per signed-off finding plus a one-line verdict per chunk (ship it / needs changes / blocked). Then delete the ledger. The registry carries what survives; the ledger is scratch.
+Recap only after every finding was individually addressed: one line per signed-off finding plus a one-line verdict per chunk (ship it / needs changes / blocked). Then delete the ledger.
