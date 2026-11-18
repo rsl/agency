@@ -27,6 +27,8 @@ Customer names, project names, repo names, end-user names, and incident-specific
 
 Run from the project root whose `.agent-notes/` you mean. Requires Ruby 4.0+ via any version manager — macOS system Ruby (2.6) won't run it.
 
+**Before you finish any note edit, make sure the note passes lint** — run `agency notes lint` (and `agency notes format` for autofixable problems) as part of wrapping the change, not as a later cleanup. `format` can't fix everything (e.g. invalid YAML it can't parse); if it reports "could not autofix", fix the frontmatter by hand and re-lint until clean.
+
 - `agency notes report` — grouped TOC by status (durable layer: root + `plans/` + `research/`).
 - `agency notes lint` — exits non-zero on missing or invalid frontmatter. Durable notes only; the ephemeral layer is exempt. Wires into hooks.
 - `agency notes format` — autofills missing fields; review the diff, the derived summary is a starting point.

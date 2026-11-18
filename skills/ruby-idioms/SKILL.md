@@ -77,6 +77,10 @@ private_class_method def self.key_for(url)
 end
 ```
 
+## RuboCop directives: `disable-next`, never `disable-next-line`
+
+A single-line suppression is `# rubocop:disable-next <Cop>`. There is no `disable-next-line` in RuboCop — the directive modes are `disable`, `enable`, `todo`, `push`, `pop`, `disable-next`, `todo-next`, `enable-next`, `next` (RuboCop 1.92, `directive_comment.rb`) — so the `-line` spelling writes an unrecognized directive: the warning fires and the offense still trips. The mistake recurs because other linters (ESLint and friends) use a `-line` suffix; RuboCop does not, at any version.
+
 ## Judgment boundary
 
 Do not force the idiom when it gets contorted: multiple exit points, heavily conditional accumulation, or a result built across unrelated branches. Readability wins - no linter or quality metric measures this.
